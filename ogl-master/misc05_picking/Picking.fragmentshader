@@ -1,0 +1,24 @@
+#version 330 core
+
+in vec4 vs_vertexColor;
+out vec4 color;
+
+uniform bool isSelected;
+uniform bool usePicking;
+uniform float PickingColor;
+
+void main() {
+    vec3 baseColor = vs_vertexColor.rgb;
+
+    // If the object is selected, increase brightness for visual feedback
+    if (isSelected && !usePicking) {
+        baseColor = min(baseColor * 1.5, vec3(1.0));
+    }
+
+    // If in picking mode, output picking color; otherwise, output modified base color
+    if (usePicking) {
+        color = vec4(PickingColor, 0.0, 0.0, 1.0); // Picking color (usually red for selection mode)
+    } else {
+        color = vec4(baseColor, vs_vertexColor.a); // Normal color with selection highlight
+    }
+}

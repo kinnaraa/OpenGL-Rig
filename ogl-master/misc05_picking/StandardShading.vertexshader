@@ -1,0 +1,32 @@
+#version 330 core
+
+// Input vertex data, different for each execution of this shader.
+layout(location = 0) in vec4 vertexPosition_modelspace;
+layout(location = 1) in vec4 vertexColor;
+layout(location = 2) in vec3 vertexNormal;
+
+// Output data; will be interpolated for each fragment.
+out vec4 vs_vertexColor;
+out vec3 FragPos;             // Position in world space for lighting calculations
+out vec3 Normal;              // Normal in world space for lighting calculations
+
+// Values that stay constant for the whole mesh.
+uniform mat4 M;               // Model matrix
+uniform mat4 V;               // View matrix
+uniform mat4 P;               // Projection matrix
+
+void main() {
+    gl_PointSize = 10.0;
+
+    // Output position of the vertex, in clip space : MVP * position
+    gl_Position = P * V * M * vertexPosition_modelspace;
+
+    // Position of the vertex, in world space
+    FragPos = vec3(M * vertexPosition_modelspace);
+
+    // Normal of the vertex, transformed to world space
+    Normal = mat3(transpose(inverse(M))) * vertexNormal; // Use inverse transpose for correct transformation
+
+    // Pass the vertex color to the fragment shader (if needed)
+    vs_vertexColor = vertexColor;
+}

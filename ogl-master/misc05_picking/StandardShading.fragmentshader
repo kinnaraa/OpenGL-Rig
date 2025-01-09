@@ -1,0 +1,68 @@
+#version 330 core
+
+// Interpolated values from the vertex shaders
+in vec4 vs_vertexColor;
+in vec3 FragPos;      // Position in world space for lighting calculations
+in vec3 Normal;       // Normal at the fragment in world space
+
+// Light and material properties (these could be set as uniforms)
+uniform vec3 materialDiffuse;
+uniform vec3 materialAmbient;
+uniform vec3 materialSpecular;
+uniform float materialShininess;
+
+uniform vec3 lightPos1;
+uniform vec3 lightDiffuse1;
+uniform vec3 lightAmbient1;
+uniform vec3 lightSpecular1;
+
+uniform vec3 lightPos2;
+uniform vec3 lightDiffuse2;
+uniform vec3 lightAmbient2;
+uniform vec3 lightSpecular2;
+
+uniform vec3 viewPosition;
+uniform bool useLighting;
+uniform bool isSelected; 
+
+out vec4 FragColor;
+
+void main()
+{
+    vec3 adjustedAmbient = materialAmbient;
+    vec3 adjustedDiffuse = materialDiffuse;
+
+    // Increase brightness if selected
+    if (isSelected) {
+        adjustedAmbient *= 2;
+        adjustedDiffuse *= 2;
+    }
+
+    if (useLighting) {
+        vec3 norm = normalize(Normal);
+        vec3 viewDir = normalize(viewPosition - FragPos);
+        vec3 finalColor = vec3(0.0);
+
+        vec3 lightsPos[2] = vec3[2](lightPos1, lightPos2);
+        vec3 lightsDiffuse[2] = vec3[2](lightDiffuse1, lightDiffuse2);
+        vec3 lightsAmbient[2] = vec3[2](lightAmbient1, lightAmbient2);
+        vec3 lightsSpecular[2] = vec3[2](lightSpecular1, lightSpecular2);
+
+        for (int i = 0; i < 2; i++) {
+            vec3 lightDir = normalize(lightsPos[i] - FragPos);
+            vec3 ambient = lightsAmbient[i] * adjustedAmbient;
+            float diff = max(dot(norm, lightDir), 0.0);
+            vec3 diffuse = lightsDiffuse[i] * diff * adjustedDiffuse;
+
+            vec3 reflectDir = reflect(-lightDir, norm);
+            float spec = pow(max(dot(viewDir, reflectDir), 0.0), materialShininess);
+            vec3 specular = lightsSpecular[i] * spec * materialSpecular;
+
+            finalColor += ambient + diffuse + specular;
+        }
+
+        FragColor = vec4(finalColor, 1.0);
+    } else {
+        FragColor = vs_vertexColor;
+    }
+}
