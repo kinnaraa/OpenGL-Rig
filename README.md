@@ -11,3 +11,8 @@ Press 1 or 2 to select either Arm 1 or 2 and use the up and down arrow keys to r
 Press P to select the pen and any arrow keys to rotate it. Press Shift + left/right arrow keys to rotate about its own axis.
 
 Press S to shoot a projectile from the tip of the pen.
+
+**Demo Video:**
+
+https://github.com/user-attachments/assets/158f75e0-ebcb-4e1e-9af0-6e975fc4c22f
+
